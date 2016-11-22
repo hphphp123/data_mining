@@ -74,9 +74,8 @@ void filter(){
 		float YR_2 = atof(data_line[15].data());
 		float DISCOUNT = atof(data_line[28].data());
 		float SEG = atof(data_line[16].data());
-
 		if((YR_1==0)&&(YR_2==0)){
-			if(!DISCOUNT && SEG){
+			if(DISCOUNT && (SEG > 0)){
 				clean_line.push_back(total);
 				continue;
 			}
