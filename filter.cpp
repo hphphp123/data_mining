@@ -97,8 +97,9 @@ int main(){
 
 	int curr=0;
 	int clean_num=clean_line.size();
-	int flag=0;
+
 	while(f.good()){
+		int flag=0;
 		curr++;
 		getline(f,line,'\n');
 		for(int i=0;i<clean_num;i++){
