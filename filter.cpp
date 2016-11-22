@@ -39,6 +39,8 @@ bool isNum(const string &str){
      }
      return true;
 }
+
+
 vector<int> clean_line;//store the number of cleaned lines
 void filter(){
 	fstream f("hw1air_data.csv");
@@ -68,13 +70,13 @@ void filter(){
 			continue;
 		}
 
-		float YR_1 = atof(data_line[15].data());
-		float YR_2 = atof(data_line[16].data());
-		float DISCOUNT = atof(data_line[29].data());
-		float SEG = atof(data_line[17].data());
+		float YR_1 = atof(data_line[14].data());
+		float YR_2 = atof(data_line[15].data());
+		float DISCOUNT = atof(data_line[28].data());
+		float SEG = atof(data_line[16].data());
 
 		if((YR_1==0)&&(YR_2==0)){
-			if(DISCOUNT&&!SEG){
+			if(!DISCOUNT && SEG){
 				clean_line.push_back(total);
 				continue;
 			}
@@ -83,12 +85,15 @@ void filter(){
 }
 
 int main(){
+
 	filter();
-	fstream f("hw1air_data.csv");
-	string line;
+
 	//once again
 	freopen("cleaned_out.csv","w",stdout);
+	fstream f("hw1air_data.csv");
+	string line;
 	getline(f,line,'\n');
+	cout<<line<<endl;
 
 	int curr=0;
 	int clean_num=clean_line.size();
