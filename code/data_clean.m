@@ -1,8 +1,8 @@
 %% 数据清洗，过滤掉不符合规则的数据
 clear;
 % 参数初始化
-datafile = '../data/air_data.csv';  % 数据文件
-cleanedfile = '../tmp/data_cleaned.csv';  % 数据清洗后保存的文件
+datafile = 'hw1air_data.csv';  % 数据文件
+cleanedfile = 'data_cleaned.csv';  % 数据清洗后保存的文件
 
 %% 清洗空值和不符规则的数据
 [num,txt]=xlsread(datafile);     
