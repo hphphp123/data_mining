@@ -16,9 +16,9 @@
 
 #endif /* K_means_hpp */
 
-#define dimension 3
-#define sampleNum 10
-#define k 3
+#define dimension 5
+#define sampleNum 62048
+#define k 5
 
 
 typedef struct node{

@@ -8,14 +8,43 @@
 
 #include "K_means.hpp"
 
+
+
+
 void LoadData(char filename[]){
-    
+    FILE *fp = fopen(filename, "r");
+    if(fp == NULL) {
+        return ;
+    }
+    char line[1044];
+    const char *d = ",\r\n";
+    char *p;
+    int nnn = -1;
+    while(fgets(line, sizeof(line), fp)) {
+        
+        if( nnn == -1){
+            nnn ++;
+            continue;
+        }
+//        printf("%s",line);
+        p = strtok(line, d);
+        int index = 0;
+        while(p)
+        {
+//            printf("%s to ",p);
+//            printf("%lf\n",atof(p)); //读出的小数
+            sample[nnn].address[index ++] = atof(p);
+            p=strtok(NULL,d);
+        }
+        nnn ++;
+    }
+    fclose(fp);
 }
 
 void InitializeCoreNode(){
     //initialize CoreNode
     for (int i = 0; i < sampleNum; i ++) {
-        sample[i].Clas = -1;
+        sample[i].Clas = 0;
     }
     for (int i = 0; i < k; i ++) {
         for (int j = 0; j < dimension; j ++) {
@@ -66,7 +95,6 @@ void K_Means(){
         if(change == 0)
             break;
         
-        printf("...\n");
         //更新coreNode
         memset(coreNode,0,sizeof(coreNode));
         for (int i = 0; i < sampleNum; i ++) {
@@ -78,29 +106,39 @@ void K_Means(){
             for (int j = 0; j < dimension; j ++) {
                 coreNode[i].address[j] /= classLen[i];
             }
-            printf("\n");
-            
             
         }
     }
 }
 
-void outPut(){
+void outPut(char outfile[]){
+    FILE *fp = fopen(outfile, "w");
+    if(fp == NULL) {
+        return ;
+    }
+    char temp[100];
+    memset(temp, 0, sizeof(temp));
+    temp[1] = '\r';
+    temp[2] = '\n';
+    for (int i = 0; i < sampleNum; i ++) {
+        temp[0] = sample[i].Clas + '0';
+        fputs(temp,fp);
+    }
     
+    fclose(fp);
 }
 
 
 int main()
 {
-    char filename[50];
-    scanf("%s",filename);
+    char filename[1000] = "/Users/haifeng/Documents/国科大/课程/数据挖掘/project/data_mining/OutLRFMCData.csv";
+    char outfile[] = "/Users/haifeng/Documents/国科大/课程/数据挖掘/project/data_mining/K_MeansOutFile.csv";
+//    scanf("%s",filename);
     LoadData(filename);
-    
-    
     InitializeCoreNode();
     K_Means();
-    outPut();
-    
+    outPut(outfile);
+    printf("success!\n");
     
     return 0;
 }
