@@ -13,6 +13,9 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
+#include <sys/time.h>
+
+
 
 #endif /* K_means_hpp */
 
