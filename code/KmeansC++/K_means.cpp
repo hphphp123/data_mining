@@ -9,7 +9,15 @@
 #include "K_means.hpp"
 
 
-
+//欧氏距离
+double distance(NODE t1, NODE t2){
+    double ans = 0;
+    for (int i = 0; i < dimension; i ++) {
+        ans += (t1.address[i] - t2.address[i]) * (t1.address[i] - t2.address[i]);
+    }
+    ans = pow(ans, 1.0/(double)dimension);
+    return ans;
+}
 
 void LoadData(char filename[]){
     FILE *fp = fopen(filename, "r");
@@ -44,26 +52,57 @@ void LoadData(char filename[]){
 void InitializeCoreNode(){
     //initialize CoreNode
     for (int i = 0; i < sampleNum; i ++) {
-        sample[i].Clas = 0;
+        sample[i].Clas = -1;
     }
     for (int i = 0; i < k; i ++) {
         for (int j = 0; j < dimension; j ++) {
             coreNode[i].address[j] = rand() / (RAND_MAX+0.1);  //产生0-1的随机数
         }
     }
-    
-    
 }
 
-//欧氏距离
-double distance(NODE t1, NODE t2){
-    double ans = 0;
-    for (int i = 0; i < dimension; i ++) {
-        ans += (t1.address[i] - t2.address[i]) * (t1.address[i] - t2.address[i]);
+// use k-means ++ method
+void InitializeCorKMeans(){
+    for (int i = 0; i < sampleNum; i ++) {
+        sample[i].Clas = -1;
     }
-    ans = pow(ans, 1.0/(double)dimension);
-    return ans;
+    
+    int tempIndex = (int)((sampleNum - 1) * rand() / (RAND_MAX+0.1)); //产生 0 - (sampleNum-1)的随机数，使其作为seed
+    for (int i = 0; i < dimension; i ++) {
+        coreNode[0].address[i] = sample[tempIndex].address[i];
+    }
+    double len[sampleNum];
+    memset(len, 0, sizeof(len));
+    
+    //计算另外k-1个初始中心
+    for (int i = 1; i < k; i ++) {
+        double sumLen = 0;
+        //更新每个sample距离D(x)
+        for (int j = 0; j < sampleNum; j ++) {
+            double minlen = 99999;
+            for (int m = 0; m < i; m ++) {
+                if(minlen > distance(coreNode[m], sample[j])){
+                    minlen = distance(coreNode[m], sample[j]);
+                }
+            }
+            len[j] = minlen;
+            sumLen += len[j];
+        }
+        
+        double random = (sumLen) * rand() / (RAND_MAX+0.1); // 产生0-sum(D(x))的随机值random
+        for (int j = 0; j < sampleNum; j ++) {
+            if(random < 0){
+                for (int m = 0; m < dimension; m ++) {
+                    coreNode[i].address[m] = sample[j].address[m];
+                }
+                break;
+            }
+            random -= len[j];
+        }
+    }
 }
+
+
 
 
 int classify(NODE tmp){
@@ -81,6 +120,7 @@ int classify(NODE tmp){
 
 void K_Means(){
     int change = 1;
+    int num = 0;
     while(true){
         memset(classLen,0,sizeof(classLen));
         change = 0;
@@ -94,7 +134,7 @@ void K_Means(){
         }
         if(change == 0)
             break;
-        
+//        printf("%d\n",num++);
         //更新coreNode
         memset(coreNode,0,sizeof(coreNode));
         for (int i = 0; i < sampleNum; i ++) {
@@ -128,16 +168,35 @@ void outPut(char outfile[]){
     fclose(fp);
 }
 
+void analyseAns(){
+    for (int i = 0; i < k; i ++) {
+        printf("第%d类有%d个，中心点坐标为:(",i,classLen[i]);
+        for (int j = 0; j < dimension; j ++) {
+            printf("%lf",coreNode[i].address[j]);
+            if(j == dimension - 1)
+                printf(")");
+            else printf(",");
+        }
+        printf("\n");
+    }
+}
+
 
 int main()
 {
+    srand(time(NULL));
     char filename[1000] = "/Users/haifeng/Documents/国科大/课程/数据挖掘/project/data_mining/OutLRFMCData.csv";
     char outfile[] = "/Users/haifeng/Documents/国科大/课程/数据挖掘/project/data_mining/K_MeansOutFile.csv";
 //    scanf("%s",filename);
     LoadData(filename);
-    InitializeCoreNode();
+//    InitializeCoreNode();
+    InitializeCorKMeans();
     K_Means();
     outPut(outfile);
+    analyseAns();
+    for (int i = 0; i < k; i ++) {
+        printf("%d ",classLen[i] );
+    }
     printf("success!\n");
     
     return 0;
